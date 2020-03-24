@@ -16,7 +16,7 @@ bl_info = {
     "version": (0, 1),
     "blender": (2, 80, 0),
     "location": "File > Export > Nori exporter (.xml)",
-    "description": "Export Nori scenes format (.xml)",
+    "description": "Export Nori scene format (.xml)",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
@@ -176,7 +176,7 @@ class NoriExporter(bpy.types.Operator, ExportHelper):
 
 
 def menu_func_export(self, context):
-    self.layout.operator(NoriExporter.bl_idname, text="Export Nori scenes...")
+    self.layout.operator(NoriExporter.bl_idname, text="Export Nori scene...")
 
 
 def register():
