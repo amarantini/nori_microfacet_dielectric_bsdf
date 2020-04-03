@@ -1,8 +1,8 @@
 language: cpp
-dist: trusty
+dist: bionic
 sudo: false
 os: linux
-compiler: gcc-7
+compiler: gcc
 notifications:
   email: false
 
@@ -12,7 +12,6 @@ addons:
       - ubuntu-toolchain-r-test
       - kubuntu-backports
     packages:
-      - g++-7
       - libglu1-mesa-dev
       - libxxf86vm-dev
       - libxrandr-dev
@@ -59,7 +58,7 @@ script:
       cd ..
       touch `echo $changed_files` || true
     else
-      cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 ..
+      cmake ${CMAKE_OPTIONS} ..
     fi
   # Either way, run `make` to build newest changes.
   - cd "${TRAVIS_BUILD_DIR}/build"
