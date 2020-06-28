@@ -32,6 +32,9 @@ void Accel::addMesh(Mesh *mesh) {
 }
 
 void Accel::build() {
+    if (!m_mesh)
+        throw NoriException("No mesh found, could not build acceleration structure");
+
     auto start = high_resolution_clock::now();
     delete m_root;
 
@@ -40,7 +43,8 @@ void Accel::build() {
     for(uint32_t i = 0; i < num_triangles; i++) {
         triangles.emplace_back(i);
     }
-    m_root = buildRecursive(m_mesh->getBoundingBox(), triangles, 0);
+
+    m_root = buildRecursive(m_bbox, triangles, 0);
     printf("Octree build time: %ldms \n", duration_cast<milliseconds>(high_resolution_clock::now() - start).count());
     printf("Num nodes: %d \n", m_num_nodes);
     printf("Num leaf nodes: %d \n", m_num_leaf_nodes);
@@ -179,7 +183,9 @@ Accel::Node* Accel::buildRecursive(const BoundingBox3f& bbox, std::vector<uint32
 
             // for every triangle vertex expand triangle bbox
             for (uint32_t k = 0; k < 3; k++) {
-                triangle_bbox.expandBy(m_mesh->getVertexPositions().col(m_mesh->getIndices()(k, triangle_indices[j])));
+                uint32_t idx = m_mesh->getIndices()(k, triangle_indices[j]);
+                const Point3f p = m_mesh->getVertexPositions().col(idx);
+                triangle_bbox.expandBy(p);
             }
 
             // check if triangle is in bbox
