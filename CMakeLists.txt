@@ -122,4 +122,7 @@ if (CMAKE_GENERATOR STREQUAL "Ninja")
   endif()
 endif()
 
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O1")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-O3")
+
 # vim: set et ts=2 sw=2 ft=cmake nospell:
