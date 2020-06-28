@@ -22,6 +22,9 @@
 
 NORI_NAMESPACE_BEGIN
 
+static constexpr uint32_t MAX_TRIANGLES_PER_NODE = 10;
+static constexpr uint32_t MAX_RECURSION_DEPTH = 7;
+
 /**
  * \brief Acceleration data structure for ray intersection queries
  *
@@ -29,7 +32,26 @@ NORI_NAMESPACE_BEGIN
  * through the geometry.
  */
 class Accel {
+
+    struct Node {
+        uint32_t num_triangles = 0;
+        BoundingBox3f bbox;
+        Node* next = nullptr;
+        Node* child = nullptr;
+        uint32_t* triangle_indices = nullptr;
+
+        ~Node() {
+            delete triangle_indices;
+            delete next;
+            delete child;
+        }
+
+        bool isEmpty() { return num_triangles == 0; }
+    };
+
 public:
+    ~Accel() { delete m_root; }
+
     /**
      * \brief Register a triangle mesh for inclusion in the acceleration
      * data structure
@@ -66,8 +88,19 @@ public:
     bool rayIntersect(const Ray3f &ray, Intersection &its, bool shadowRay) const;
 
 private:
-    Mesh         *m_mesh = nullptr; ///< Mesh (only a single one for now)
+    Node* buildRecursive(const BoundingBox3f& bbox, std::vector<uint32_t>& triangle_indices, uint32_t recursion_depth);
+    static void subdivideBBox(const BoundingBox3f& parent, BoundingBox3f* bboxes);
+
+    Mesh*         m_mesh = nullptr; ///< Mesh (only a single one for now)
     BoundingBox3f m_bbox;           ///< Bounding box of the entire scene
+    Node*         m_root = nullptr; ///< Root node of Octree
+
+    // only statistics
+    uint32_t m_num_nonempty_leaf_nodes = 0;
+    uint32_t m_num_leaf_nodes = 0;
+    uint32_t m_num_nodes = 0;
+    uint32_t m_recursion_depth = 0;
+    uint32_t m_num_triangles_saved = 0;
 };
 
 NORI_NAMESPACE_END
