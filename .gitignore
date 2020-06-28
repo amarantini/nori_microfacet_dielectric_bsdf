@@ -30,3 +30,7 @@ x64
 # clion
 .idea
 cmake-build*
+
+# nori generated images
+*.exr
+*.png
