@@ -34,3 +34,6 @@ cmake-build*
 # nori generated images
 *.exr
 *.png
+
+# large ajax.obj file
+scenes/pa2/ajax.obj
