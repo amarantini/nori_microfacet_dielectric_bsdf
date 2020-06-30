@@ -225,34 +225,49 @@ bool Accel::traverseRecursive(const Node& node, Ray3f &ray, Intersection &its, b
     bool foundIntersection = false;
 
     // only check triangles of node and its children if ray intersects with node bbox
-    if (node.bbox.rayIntersect(ray)) {
-
-        // search through all triangles in node
-        for (uint32_t i = 0; i < node.num_triangles; ++i) {
-            float u, v, t;
-            uint32_t idx = node.triangle_indices[i];
-            if (m_mesh->rayIntersect(idx, ray, u, v, t) && t < ray.maxt) {
-                /* An intersection was found! Can terminate
-                   immediately if this is a shadow ray query */
-                if (shadowRay)
-                    return true;
-                ray.maxt = t;
-                its.t = t;
-                its.uv = Point2f(u, v);
-                its.mesh = m_mesh;
-                hit_idx = idx;
-                foundIntersection = true;
-                ray = Ray3f(ray);
-            }
-        }
-
-        if (node.child)
-            foundIntersection = traverseRecursive(*node.child, ray, its, shadowRay, hit_idx) || foundIntersection;
-        if (shadowRay && foundIntersection)
-            return true;
+    if (!node.bbox.rayIntersect(ray)) {
+        return false;
     }
-    if (node.next)
-        foundIntersection = traverseRecursive(*node.next, ray, its, shadowRay, hit_idx) || foundIntersection;
+
+    // search through all triangles in node
+    for (uint32_t i = 0; i < node.num_triangles; ++i) {
+        float u, v, t;
+        uint32_t idx = node.triangle_indices[i];
+        if (m_mesh->rayIntersect(idx, ray, u, v, t) && t < ray.maxt) {
+            /* An intersection was found! Can terminate
+               immediately if this is a shadow ray query */
+            if (shadowRay)
+                return true;
+            ray.maxt = t;
+            its.t = t;
+            its.uv = Point2f(u, v);
+            its.mesh = m_mesh;
+            hit_idx = idx;
+            foundIntersection = true;
+            ray = Ray3f(ray);
+        }
+    }
+
+    if (node.child) {
+        std::pair<Node*, float> children[8];
+        Node* current_child = node.child;
+        int i = 0;
+        do {
+            children[i] = std::pair<Node*, float>(current_child, current_child->bbox.distanceTo(ray.o));
+            current_child = current_child->next;
+            i++;
+        } while (current_child);
+
+        std::sort(children, children + 8, [ray](const std::pair<Node*, float>& l, const std::pair<Node*, float>& r) {
+            return l.second < r.second;
+        });
+
+        for (auto child: children) {
+            foundIntersection = traverseRecursive(*child.first, ray, its, shadowRay, hit_idx) || foundIntersection;
+            if (shadowRay && foundIntersection)
+                return true;
+        }
+    }
     return foundIntersection;
 }
 
