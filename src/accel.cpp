@@ -39,9 +39,9 @@ void Accel::build() {
     delete m_root;
 
     uint32_t num_triangles = m_mesh->getTriangleCount();
-    std::vector<uint32_t> triangles;
+    std::vector<uint32_t> triangles(num_triangles);
     for(uint32_t i = 0; i < num_triangles; i++) {
-        triangles.emplace_back(i);
+        triangles[i] = i;
     }
 
     m_root = buildRecursive(m_bbox, triangles, 0);
@@ -60,21 +60,23 @@ bool Accel::rayIntersect(const Ray3f &ray_, Intersection &its, bool shadowRay) c
 
     Ray3f ray(ray_); /// Make a copy of the ray (we will need to update its '.maxt' value)
 
-    /* Brute force search through all triangles */
-    for (uint32_t idx = 0; idx < m_mesh->getTriangleCount(); ++idx) {
-        float u, v, t;
-        if (m_mesh->rayIntersect(idx, ray, u, v, t)) {
-            /* An intersection was found! Can terminate
-               immediately if this is a shadow ray query */
-            if (shadowRay)
-                return true;
-            ray.maxt = its.t = t;
-            its.uv = Point2f(u, v);
-            its.mesh = m_mesh;
-            f = idx;
-            foundIntersection = true;
-        }
-    }
+    foundIntersection = traverseRecursive(*m_root, ray, its, shadowRay, f);
+
+//    /* Brute force search through all triangles */
+//    for (uint32_t idx = 0; idx < m_mesh->getTriangleCount(); ++idx) {
+//        float u, v, t;
+//        if (m_mesh->rayIntersect(idx, ray, u, v, t)) {
+//            /* An intersection was found! Can terminate
+//               immediately if this is a shadow ray query */
+//            if (shadowRay)
+//                return true;
+//            ray.maxt = its.t = t;
+//            its.uv = Point2f(u, v);
+//            its.mesh = m_mesh;
+//            f = idx;
+//            foundIntersection = true;
+//        }
+//    }
 
     if (foundIntersection) {
         /* At this point, we now know that there is an intersection,
@@ -166,15 +168,18 @@ Accel::Node* Accel::buildRecursive(const BoundingBox3f& bbox, std::vector<uint32
         return node;
     }
 
+    // create new parent node
     Node* node = new Node();
+    node->bbox = BoundingBox3f(bbox);
 
-    BoundingBox3f bboxes[8] = {};
-    subdivideBBox(bbox, bboxes);
+    BoundingBox3f child_bboxes[8] = {};
+    subdivideBBox(bbox, child_bboxes);
 
-    std::vector<std::vector<uint32_t>> bbox_triangle_indices(8);
+    std::vector<std::vector<uint32_t>> child_triangle_indices(8);
 
-    uint32_t bbox_num_triangles[8] = {};
+    uint32_t child_num_triangles[8] = {};
 
+    // place every triangle in the children it overlaps with
     // for every child bbox
     for (uint32_t i = 0; i < 8; i++) {
         // for every triangle inside of the parent create triangle bounding box
@@ -188,10 +193,10 @@ Accel::Node* Accel::buildRecursive(const BoundingBox3f& bbox, std::vector<uint32
                 triangle_bbox.expandBy(p);
             }
 
-            // check if triangle is in bbox
-            if (bboxes[i].overlaps(triangle_bbox)) {
-                bbox_triangle_indices[i].emplace_back(triangle_indices[j]);
-                bbox_num_triangles[i]++;
+            // check if triangle is in bbox, if so put triangle index into triangle list of child
+            if (child_bboxes[i].overlaps(triangle_bbox)) {
+                child_triangle_indices[i].emplace_back(triangle_indices[j]);
+                child_num_triangles[i]++;
             }
         }
     }
@@ -204,16 +209,51 @@ Accel::Node* Accel::buildRecursive(const BoundingBox3f& bbox, std::vector<uint32
         Node* last_child;
         // first child
         if (i == 0) {
-            node->child = buildRecursive(bboxes[i], bbox_triangle_indices[i], recursion_depth + 1);
+            node->child = buildRecursive(child_bboxes[i], child_triangle_indices[i], recursion_depth + 1);
             last_child = node->child;
         // neighbour children
         } else {
-            last_child->next = buildRecursive(bboxes[i], bbox_triangle_indices[i], recursion_depth + 1);
+            last_child->next = buildRecursive(child_bboxes[i], child_triangle_indices[i], recursion_depth + 1);
             last_child = last_child->next;
         }
         m_recursion_depth = std::max(m_recursion_depth, recursion_depth + 1);
     }
     return node;
+}
+
+bool Accel::traverseRecursive(const Node& node, Ray3f &ray, Intersection &its, bool shadowRay, uint32_t& hit_idx) const {
+    bool foundIntersection = false;
+
+    // only check triangles of node and its children if ray intersects with node bbox
+    if (node.bbox.rayIntersect(ray)) {
+
+        // search through all triangles in node
+        for (uint32_t i = 0; i < node.num_triangles; ++i) {
+            float u, v, t;
+            uint32_t idx = node.triangle_indices[i];
+            if (m_mesh->rayIntersect(idx, ray, u, v, t) && t < ray.maxt) {
+                /* An intersection was found! Can terminate
+                   immediately if this is a shadow ray query */
+                if (shadowRay)
+                    return true;
+                ray.maxt = t;
+                its.t = t;
+                its.uv = Point2f(u, v);
+                its.mesh = m_mesh;
+                hit_idx = idx;
+                foundIntersection = true;
+                ray = Ray3f(ray);
+            }
+        }
+
+        if (node.child)
+            foundIntersection = traverseRecursive(*node.child, ray, its, shadowRay, hit_idx) || foundIntersection;
+        if (shadowRay && foundIntersection)
+            return true;
+    }
+    if (node.next)
+        foundIntersection = traverseRecursive(*node.next, ray, its, shadowRay, hit_idx) || foundIntersection;
+    return foundIntersection;
 }
 
 void Accel::subdivideBBox(const nori::BoundingBox3f &parent, nori::BoundingBox3f *bboxes) {

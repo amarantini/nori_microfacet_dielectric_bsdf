@@ -41,12 +41,10 @@ class Accel {
         uint32_t* triangle_indices = nullptr;
 
         ~Node() {
-            delete triangle_indices;
+            delete[] triangle_indices;
             delete next;
             delete child;
         }
-
-        bool isEmpty() { return num_triangles == 0; }
     };
 
 public:
@@ -89,6 +87,7 @@ public:
 
 private:
     Node* buildRecursive(const BoundingBox3f& bbox, std::vector<uint32_t>& triangle_indices, uint32_t recursion_depth);
+    bool traverseRecursive(const Node& node, Ray3f &ray, Intersection &its, bool shadowRay, uint32_t& hit_idx) const;
     static void subdivideBBox(const BoundingBox3f& parent, BoundingBox3f* bboxes);
 
     Mesh*         m_mesh = nullptr; ///< Mesh (only a single one for now)
