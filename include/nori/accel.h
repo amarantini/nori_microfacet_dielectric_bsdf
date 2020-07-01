@@ -22,8 +22,8 @@
 
 NORI_NAMESPACE_BEGIN
 
-static constexpr uint32_t MAX_TRIANGLES_PER_NODE = 10;
-static constexpr uint32_t MAX_RECURSION_DEPTH = 7;
+static constexpr uint32_t MAX_TRIANGLES_PER_NODE = 15;
+static constexpr uint32_t MAX_RECURSION_DEPTH = 10;
 
 /**
  * \brief Acceleration data structure for ray intersection queries
