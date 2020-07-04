@@ -9,7 +9,7 @@
 
 	<!-- Load the Ajax bust (a freely available scan from the Jotero forum) -->
 	<mesh type="obj">
-		<string name="filename" value="ajax.obj"/>
+		<string name="filename" value="../pa2/ajax.obj"/>
 
 		<bsdf type="diffuse"/>
 	</mesh>
