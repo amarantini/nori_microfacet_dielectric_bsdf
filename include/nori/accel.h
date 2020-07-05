@@ -24,6 +24,7 @@ NORI_NAMESPACE_BEGIN
 
 static constexpr uint32_t MAX_TRIANGLES_PER_NODE = 15;
 static constexpr uint32_t MAX_RECURSION_DEPTH = 10;
+static constexpr uint32_t MAX_NUM_MESHES = 32;
 
 /**
  * \brief Acceleration data structure for ray intersection queries
@@ -39,9 +40,11 @@ class Accel {
         Node* next = nullptr;
         Node* child = nullptr;
         uint32_t* triangle_indices = nullptr;
+        uint32_t* mesh_indices = nullptr;
 
         ~Node() {
             delete[] triangle_indices;
+            delete[] mesh_indices;
             delete next;
             delete child;
         }
@@ -86,13 +89,15 @@ public:
     bool rayIntersect(const Ray3f &ray, Intersection &its, bool shadowRay) const;
 
 private:
-    Node* buildRecursive(const BoundingBox3f& bbox, std::vector<uint32_t>& triangle_indices, uint32_t recursion_depth);
+    Node* buildRecursive(const BoundingBox3f& bbox, std::vector<uint32_t>& triangle_indices,
+            std::vector<uint32_t>& mesh_indices, uint32_t recursion_depth);
     bool traverseRecursive(const Node& node, Ray3f &ray, Intersection &its, bool shadowRay, uint32_t& hit_idx) const;
     static void subdivideBBox(const BoundingBox3f& parent, BoundingBox3f* bboxes);
 
-    Mesh*         m_mesh = nullptr; ///< Mesh (only a single one for now)
+    Mesh*         m_meshes[MAX_NUM_MESHES]; ///< Meshes (up to MAX_NUM_MESHES meshes)
     BoundingBox3f m_bbox;           ///< Bounding box of the entire scene
     Node*         m_root = nullptr; ///< Root node of Octree
+    uint32_t      m_num_meshes = 0; ///< number of meshes in accel
 
     // only statistics
     uint32_t m_num_nonempty_leaf_nodes = 0;
