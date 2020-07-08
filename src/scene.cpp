@@ -61,6 +61,10 @@ void Scene::addChild(NoriObject *obj) {
                 Mesh *mesh = static_cast<Mesh *>(obj);
                 m_accel->addMesh(mesh);
                 m_meshes.push_back(mesh);
+                // currently emitter are implemented as children of mesh objects so we keep treck of mesh emitters
+                if (mesh->isEmitter()) {
+                    m_emitter.emplace_back(mesh);
+                }
             }
             break;
         

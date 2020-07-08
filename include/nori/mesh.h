@@ -21,6 +21,7 @@
 #include <nori/object.h>
 #include <nori/frame.h>
 #include <nori/bbox.h>
+#include <nori/dpdf.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -163,6 +164,16 @@ public:
      * */
     EClassType getClassType() const { return EMesh; }
 
+    /**
+     * \brief warp a uniform sample to the surface of the mesh.
+     * @param sample  uniform sample in [0,1]
+     * @param sampler uniform 2D sampler
+     * @param normal  surface normal at sampled surface point
+     * @param pdf     pdf of sample (1/surface area of mesh)
+     * @return        sampled point on mesh surface
+     */
+    Point3f sampleSurfaceUniform(float sample, Sampler* sampler, Normal3f& normal, float& pdf);
+
 protected:
     /// Create an empty mesh
     Mesh();
@@ -176,6 +187,7 @@ protected:
     BSDF         *m_bsdf = nullptr;      ///< BSDF of the surface
     Emitter    *m_emitter = nullptr;     ///< Associated emitter, if any
     BoundingBox3f m_bbox;                ///< Bounding box of the mesh
+    DiscretePDF m_dpdf;                  ///< Discrete PDF to sample mesh surface, only for emitter
 };
 
 NORI_NAMESPACE_END

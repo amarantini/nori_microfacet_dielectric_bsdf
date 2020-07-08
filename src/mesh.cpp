@@ -38,6 +38,15 @@ void Mesh::activate() {
         m_bsdf = static_cast<BSDF *>(
             NoriObjectFactory::createInstance("diffuse", PropertyList()));
     }
+
+    // initialize discrete pdf for surface sampling
+    if (isEmitter()) {
+        m_dpdf.reserve(getTriangleCount());
+        for (uint32_t i = 0; i < getTriangleCount(); i++) {
+            m_dpdf.append(surfaceArea(i));
+        }
+        m_dpdf.normalize();
+    }
 }
 
 float Mesh::surfaceArea(uint32_t index) const {
@@ -140,6 +149,36 @@ std::string Mesh::toString() const {
         m_bsdf ? indent(m_bsdf->toString()) : std::string("null"),
         m_emitter ? indent(m_emitter->toString()) : std::string("null")
     );
+}
+
+Point3f Mesh::sampleSurfaceUniform(float sample, Sampler* sampler, Normal3f &normal, float &pdf) {
+    uint32_t triangle_idx = m_dpdf.sample(sample);
+
+    // create baryzentric sample
+    Point2f sample_2d = sampler->next2D();
+    float alpha = 1 - sqrt(1 - sample_2d.x());
+    float beta = sample_2d.y() * sqrt(1 - sample_2d.x());
+
+    // sample point on triangle using baryzentric coordinates
+    Point3f v_a = m_V.col(m_F(0, triangle_idx));
+    Point3f v_b = m_V.col(m_F(1, triangle_idx));
+    Point3f v_c = m_V.col(m_F(2, triangle_idx));
+    Point3f sampled_point = alpha * v_a + beta * v_b + (1 - alpha - beta) * v_c;
+
+    // sample normal using baryzentric coordinates
+    if (m_N.size() != 0) {
+        Point3f n_a = m_N.col(m_F(0, triangle_idx));
+        Point3f n_b = m_N.col(m_F(1, triangle_idx));
+        Point3f n_c = m_N.col(m_F(2, triangle_idx));
+        normal = (alpha * n_a + beta * n_b + (1 - alpha - beta) * n_c).normalized();
+    } else {
+        // calculate the surface normal of the triangle if vertex normals are not present
+        Vector3f e_1 = v_b - v_a;
+        Vector3f e_2 = v_c - v_a;
+        normal = e_1.cross(e_2).normalized();
+    }
+    pdf = m_dpdf.getNormalization();
+    return sampled_point;
 }
 
 std::string Intersection::toString() const {

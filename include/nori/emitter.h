@@ -22,6 +22,20 @@
 
 NORI_NAMESPACE_BEGIN
 
+struct EmitterQueryRecord {
+    Point3f shading_point;
+    Normal3f shading_normal;
+    Point3f light_point;
+    Normal3f light_normal;
+
+    EmitterQueryRecord(Point3f shading_point, Normal3f shading_normal, Point3f light_point, Normal3f light_normal)
+        : shading_point(std::move(shading_point)),
+        shading_normal(std::move(shading_normal)),
+        light_point(std::move(light_point)),
+        light_normal(std::move(light_normal))
+    {}
+};
+
 /**
  * \brief Superclass of all emitters
  */
@@ -33,6 +47,14 @@ public:
      * provided by this instance
      * */
     EClassType getClassType() const { return EEmitter; }
+
+    /**
+     * Evaluates a query record (calculates how much light is emitted from a light point to a shading point)
+     * @param record EmitterQueryRecord containing shading point/normal and light point/normal
+     * @return Emitted light as Color3f
+     */
+    virtual Color3f evalQueryRecord(const EmitterQueryRecord& record) const = 0;
+    virtual Color3f getRadiance() const = 0;
 };
 
 NORI_NAMESPACE_END

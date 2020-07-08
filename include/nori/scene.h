@@ -58,6 +58,8 @@ public:
     /// Return a reference to an array containing all meshes
     const std::vector<Mesh *> &getMeshes() const { return m_meshes; }
 
+    const std::vector<Mesh *> &getEmitter() const { return m_emitter; }
+
     /**
      * \brief Intersect a ray against all triangles stored in the scene
      * and return detailed intersection information
@@ -118,6 +120,7 @@ public:
     EClassType getClassType() const { return EScene; }
 private:
     std::vector<Mesh *> m_meshes;
+    std::vector<Mesh *> m_emitter;
     Integrator *m_integrator = nullptr;
     Sampler *m_sampler = nullptr;
     Camera *m_camera = nullptr;
