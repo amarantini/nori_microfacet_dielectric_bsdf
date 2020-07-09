@@ -16,10 +16,10 @@ public:
         Vector3f l_o = -l_i;
         float cos_theta_i = l_i.dot(record.shading_normal);
         float cos_theta_o = l_o.dot(record.light_normal);
-        if (cos_theta_i < 0 || cos_theta_o < 0)
+        if (cos_theta_i <= 0 || cos_theta_o <= 0)
             return {0.f};
-        float dist = x_y.squaredNorm();
-        return m_radiance * cos_theta_i * cos_theta_o / dist;
+        float dist_2 = x_y.squaredNorm();
+        return m_radiance * cos_theta_i * cos_theta_o / dist_2;
     }
 
     Color3f getRadiance() const override {

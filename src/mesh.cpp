@@ -151,8 +151,8 @@ std::string Mesh::toString() const {
     );
 }
 
-Point3f Mesh::sampleSurfaceUniform(float sample, Sampler* sampler, Normal3f &normal, float &pdf) {
-    uint32_t triangle_idx = m_dpdf.sample(sample);
+Point3f Mesh::sampleSurfaceUniform(Sampler* sampler, Normal3f &normal, float &pdf) {
+    uint32_t triangle_idx = m_dpdf.sample(sampler->next1D());
 
     // create baryzentric sample
     Point2f sample_2d = sampler->next2D();

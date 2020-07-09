@@ -166,13 +166,12 @@ public:
 
     /**
      * \brief warp a uniform sample to the surface of the mesh.
-     * @param sample  uniform sample in [0,1]
      * @param sampler uniform 2D sampler
      * @param normal  surface normal at sampled surface point
      * @param pdf     pdf of sample (1/surface area of mesh)
      * @return        sampled point on mesh surface
      */
-    Point3f sampleSurfaceUniform(float sample, Sampler* sampler, Normal3f& normal, float& pdf);
+    Point3f sampleSurfaceUniform(Sampler* sampler, Normal3f& normal, float& pdf);
 
 protected:
     /// Create an empty mesh

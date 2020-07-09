@@ -247,7 +247,6 @@ bool Accel::traverseRecursive(const Node& node, Ray3f &ray, Intersection &its, b
             its.mesh = m_meshes[mesh_idx];
             hit_idx = triangle_idx;
             foundIntersection = true;
-            ray = Ray3f(ray);
         }
     }
 
