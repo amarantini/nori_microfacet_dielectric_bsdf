@@ -37,3 +37,4 @@ cmake-build*
 
 # large ajax.obj file
 scenes/pa2/ajax.obj
+scenes/pa4/blender/ajax
