@@ -35,6 +35,9 @@ cmake-build*
 *.exr
 *.png
 
+# whitelist everything in results subdir
+!results/*
+
 # large ajax.obj file
 scenes/pa2/ajax.obj
 scenes/pa4/blender/ajax
