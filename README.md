@@ -24,9 +24,11 @@ Here you see some images I rendered.
 The original Cornell box from the course. \
 \
 ![Self created Cornell inspired box](results/cbox_mul_area.png) \
-A Cornell box inspired scene I created mainly to see how to export blender scenes into Nori. \
-\
+A Cornell box inspired scene I created mainly to see how to export blender scenes into Nori. 
+
 Ajax rough          |  Ajax smooth
 ------------------------|-------------------------
-![Ajax bust with two area lights (rough)](results/ajax_mul_area_rough.png) | ![Ajax bust with two area lights (smooth)](results/ajax_mul_area_smooth.png)\
-The ajax bust from the early assignments with two area lights, rough (a = 0.28) and smooth (a = 0.08).
+![Ajax bust with two area lights (rough)](results/ajax_mul_area_rough.png) | ![Ajax bust with two area lights (smooth)](results/ajax_mul_area_smooth.png)
+ rough (a = 0.28) | smooth (a = 0.08)
+ 
+ The ajax bust from the early assignments with two area lights
