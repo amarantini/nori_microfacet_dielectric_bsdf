@@ -103,7 +103,7 @@ float Warp::squareToCosineHemispherePdf(const Vector3f &v) {
 Vector3f Warp::squareToBeckmann(const Point2f &sample, float alpha) {
     float phi = 2 * M_PI * sample.x();
     float theta = atan(sqrt(-alpha * alpha * log(1 - sample.y())));
-    return {sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)};
+    return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)).normalized();
 }
 
 float Warp::squareToBeckmannPdf(const Vector3f &m, float alpha) {
