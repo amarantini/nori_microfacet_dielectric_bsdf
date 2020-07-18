@@ -23,7 +23,6 @@ NORI_NAMESPACE_BEGIN
             while(scene->rayIntersect(ray, its)) {
                 // if mesh is emitter, add its radiance * path contribution to evaluation sum
                 if (its.mesh->isEmitter() && Frame::cosTheta(its.shFrame.toLocal(-ray.d)) > 0) {
-//                    light_eval += its.mesh->getEmitter()->getRadiance() * fmax(0.f, Frame::cosTheta(its.shFrame.toLocal(-ray.d))) * throughput;
                     light_eval += its.mesh->getEmitter()->getRadiance() * throughput;
                 }
 
@@ -33,11 +32,14 @@ NORI_NAMESPACE_BEGIN
 
                 eta *= bRec.eta;
 
+                // start russian roulette for paths with more than 3 segments
                 if (path_length > 3) {
-                    float continuation = fmin((throughput).maxCoeff() * eta * eta, 0.99f);
+                    // calculate probability of next segment and adjust throughput weight
+                    float continuation = fmin(throughput.maxCoeff() * eta * eta, 0.99f);
                     throughput /= continuation;
                     if (sampler->next1D() > continuation) break;
                 }
+                // create new ray
                 ray = Ray3f(its.p, its.toWorld(bRec.wo));
                 path_length++;
             }
