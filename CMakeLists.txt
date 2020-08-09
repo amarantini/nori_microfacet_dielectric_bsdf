@@ -93,7 +93,8 @@ add_executable(nori
         src/ao.cpp
         src/area.cpp
         src/whitted.cpp
-        src/path_mats.cpp)
+        src/path_mats.cpp
+        src/path_ems.cpp)
 
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
