@@ -171,7 +171,9 @@ public:
      * @param pdf     pdf of sample (1/surface area of mesh)
      * @return        sampled point on mesh surface
      */
-    Point3f sampleSurfaceUniform(Sampler* sampler, Normal3f& normal, float& pdf);
+    Point3f sampleSurfaceUniform(Sampler* sampler, Normal3f& normal, float& pdf) const;
+
+    float getPdf() const { return m_dpdf.getNormalization(); }
 
 protected:
     /// Create an empty mesh
