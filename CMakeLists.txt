@@ -64,6 +64,7 @@ add_executable(nori
         include/nori/transform.h
         include/nori/vector.h
         include/nori/warp.h
+        include/nori/weighting.h
 
         # Source code files
         src/bitmap.cpp
