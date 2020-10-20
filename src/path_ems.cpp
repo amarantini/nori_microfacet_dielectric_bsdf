@@ -3,40 +3,13 @@
 #include <nori/scene.h>
 #include <nori/emitter.h>
 #include <nori/bsdf.h>
+#include <nori/scene_utils.h>
 
 NORI_NAMESPACE_BEGIN
 
     class PathEms : public Integrator {
     public:
         PathEms(const PropertyList &props) {};
-
-        Color3f directLight(const Scene* scene, Sampler* sampler, const Intersection& its, Vector3f& wo) const {
-            // sample emitter
-            Mesh *emitter_mesh;
-            const auto &emitter_meshes = scene->getEmitter();
-            float emitter_sample = sampler->next1D() * emitter_meshes.size();
-            float emitter_pdf = 1.f / (float) emitter_meshes.size();
-            emitter_mesh = emitter_meshes[(int) emitter_sample];
-
-            Emitter *emitter = emitter_mesh->getEmitter();
-
-            // sample point on emitter
-            float light_pdf;
-            Normal3f light_normal;
-            Point3f light_point = emitter_mesh->sampleSurfaceUniform(sampler, light_normal, light_pdf);
-            EmitterQueryRecord emitter_record(its.p, its.shFrame.n, light_point, light_normal);
-
-
-            // shadow ray query, corresponds to V(x, p)
-            wo = (emitter_record.light_point - emitter_record.shading_point);
-            float dist = wo.norm();
-            wo.normalize();
-            Ray3f shadow_ray = Ray3f(its.p, wo);
-            shadow_ray.maxt = dist - Epsilon;
-            if (scene->rayIntersect(shadow_ray))
-                return {0.f};
-            return emitter->evalQueryRecord(emitter_record) / emitter_pdf / light_pdf;
-        }
 
         Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &_ray) const override {
             /* Find the surface that is visible in the requested direction */
@@ -57,8 +30,11 @@ NORI_NAMESPACE_BEGIN
 
                 if (its.mesh->getBSDF()->isDiffuse()) {
                     // only compute direct light for non-specular (non-mirror, non-dielectric) materials
-                    Vector3f l_wo;
-                    Color3f direct_li = directLight(scene, sampler, its, l_wo);
+                    Emitter* emitter;
+                    float light_pdf;
+                    EmitterQueryRecord emitter_record = SceneUtils::sampleLightSource(scene, sampler, its.p, its.shFrame.n, emitter, light_pdf);
+                    Color3f direct_li = SceneUtils::getIncomingLightRadiance(emitter_record, emitter, scene) / light_pdf;
+                    Vector3f l_wo = (emitter_record.light_point - emitter_record.shading_point).normalized();
                     BSDFQueryRecord l_bRec(its.shFrame.toLocal(-ray.d), its.shFrame.toLocal(l_wo), ESolidAngle);
                     path_contribution += direct_li * its.mesh->getBSDF()->eval(l_bRec) * throughput;
                     consider_emission = false;
