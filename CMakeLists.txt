@@ -65,6 +65,7 @@ add_executable(nori
         include/nori/vector.h
         include/nori/warp.h
         include/nori/weighting.h
+        include/nori/scene_utils.h
 
         # Source code files
         src/bitmap.cpp
@@ -96,7 +97,8 @@ add_executable(nori
         src/whitted.cpp
         src/path_mats.cpp
         src/path_ems.cpp
-        src/path_mis.cpp)
+        src/path_mis.cpp
+        src/scene_utils.cpp)
 
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
