@@ -34,11 +34,11 @@ Ajax rough          |  Ajax smooth
  
  The ajax bust from the early assignments with two area lights.
  
-![Veach scene with NEE](results/veach_ems.png)
+![Veach scene with NEE](results/veach_ems.png) \
 Iconic scene from the Veach paper about multiple importance sampling rendered with next event estimation (NEE).
  
-![Veach scene with MIS](results/veach_mis.png)
+![Veach scene with MIS](results/veach_mis.png) \
 The same scene rendered with multiple importance sampling (MIS).
 
-![Cornell box path traced](results/cbox_mis.png)
+![Cornell box path traced](results/cbox_mis.png) \
 The Cornell box scene, now path traced with MIS.
