@@ -3,6 +3,7 @@
 #include <nori/scene.h>
 #include <nori/emitter.h>
 #include <nori/bsdf.h>
+#include <nori/scene_utils.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -37,19 +38,16 @@ public:
             if (its.mesh == emitter_mesh)
                 emitted_light += emitter_mesh->getEmitter()->getRadiance();
 
+            light_eval += SceneUtils::getIncomingLightRadiance(emitter_record, emitter, scene);
 
-            // shadow ray query, corresponds to V(x, p)
-            Vector3f wi = (emitter_record.light_point - emitter_record.shading_point);
-            float dist = wi.norm();
-            wi.normalize();
-            Ray3f shadow_ray = Ray3f(its.p, wi);
-            shadow_ray.maxt = dist - Epsilon;
-            if (scene->rayIntersect(shadow_ray))
-                return emitted_light;
-            light_eval += emitter->evalQueryRecord(emitter_record);
-
-            BSDFQueryRecord bsdf_record(its.toLocal(wi), its.toLocal(-ray.d), ESolidAngle);
+            Vector3f l_i = light_point - its.p;
+            float dist_2 = l_i.dot(l_i);
+            l_i = l_i.normalized();
+            float cos_theta_light = (-l_i).dot(light_normal);
+            BSDFQueryRecord bsdf_record(its.toLocal(l_i), its.toLocal(-ray.d), ESolidAngle);
             Color3f bsdf_eval = its.mesh->getBSDF()->eval(bsdf_record);
+            // convert probability measure
+            light_pdf *= dist_2 / cos_theta_light;
             return emitted_light + light_eval / light_pdf / emitter_pdf * bsdf_eval;
         } else {
             // specular shading, reflect /  refract ray, make recursive function call and weight light path
