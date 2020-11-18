@@ -20,7 +20,7 @@ public:
 
         if (scene->rayIntersect(Ray3f(its.p, sampled_dir_world)))
             return {0.f};
-        return Warp::squareToCosineHemispherePdf(sampled_dir);
+        return 1.f;
     }
 
     std::string toString() const {
