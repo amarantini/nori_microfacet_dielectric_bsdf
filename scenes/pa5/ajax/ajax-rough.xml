@@ -10,7 +10,7 @@
 	<!-- Load the Ajax bust (a freely available scan from the Jotero forum) -->
 	<mesh type="obj">
 		<string name="filename" value="../../pa2/ajax.obj"/>
-
+ 
 		<bsdf type="microfacet">
             <float name="intIOR" value="1.7"/>
             <color name="kd" value="0.2 0.2 0.4"/>

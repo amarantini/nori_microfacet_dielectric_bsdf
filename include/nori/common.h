@@ -255,7 +255,7 @@ extern Point2f sphericalCoordinates(const Vector3f &dir);
  * \param intIOR
  *      Refractive index of the interior
  */
-extern float fresnel(float cosThetaI, float extIOR, float intIOR);
+extern float fresnel (float cosThetaI, float extIOR, float intIOR);
 
 /**
  * \brief Return the global file resolver instance

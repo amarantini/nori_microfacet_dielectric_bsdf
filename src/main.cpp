@@ -150,6 +150,7 @@ static void render(Scene *scene, const std::string &filename) {
 
     /* Save tonemapped (sRGB) output using the PNG format */
     bitmap->savePNG(outputName);
+    std::cout<<"savePNG: "<<outputName<<std::endl;
 }
 
 int main(int argc, char **argv) {

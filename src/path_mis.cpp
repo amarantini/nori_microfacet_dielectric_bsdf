@@ -37,7 +37,7 @@ NORI_NAMESPACE_BEGIN
                     Color3f incoming_radiance = {0.f};
                     if (light_pdf > Epsilon) {
                         incoming_radiance = SceneUtils::getIncomingLightRadiance(emitter_record, emitter, scene) / light_pdf;
-                    }
+                    } 
 
                     Vector3f wo = (emitter_record.light_point - its.p).normalized();
                     BSDFQueryRecord bsdf_record(its.shFrame.toLocal(wi), its.shFrame.toLocal(wo), ESolidAngle);

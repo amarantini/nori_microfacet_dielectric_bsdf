@@ -106,6 +106,12 @@ Vector3f Warp::squareToBeckmann(const Point2f &sample, float alpha) {
     return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)).normalized();
 }
 
+Vector3f Warp::squareToGXX(const Point2f &sample, float alpha) {
+    float phi = 2 * M_PI * sample.x();
+    float theta = atan(sqrt(sample.y()) * alpha / sqrt(1-sample.y()));
+    return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)).normalized();
+}
+
 float Warp::squareToBeckmannPdf(const Vector3f &m, float alpha) {
     if (m.z() <= 0) return 0.f;
     float a_2 = alpha * alpha;

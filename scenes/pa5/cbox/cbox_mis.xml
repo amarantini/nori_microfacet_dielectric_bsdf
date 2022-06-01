@@ -15,7 +15,7 @@
 	</camera>
 
 	<sampler type="independent">
-		<integer name="sampleCount" value="256"/>
+		<integer name="sampleCount" value="512"/>
 	</sampler>
 
 	<mesh type="obj">
@@ -45,13 +45,26 @@
 	<mesh type="obj">
 		<string name="filename" value="meshes/sphere1.obj"/>
 
-		<bsdf type="mirror"/>
+		<!-- <bsdf type="mirror"/> -->
+		<bsdf type="microfacet">
+            <float name="intIOR" value="1.5046"/>
+			<float name="extIOR" value="1.000277"/>
+            <!-- <color name="kd" value="0.2 0.2 0.2"/> -->
+            <float name="alpha" value="0.2"/>
+		</bsdf>
 	</mesh>
 
 	<mesh type="obj">
 		<string name="filename" value="meshes/sphere2.obj"/>
 
-		<bsdf type="dielectric"/>
+		<!-- <bsdf type="dielectric"/> -->
+		<bsdf type="microfacet">
+            <float name="intIOR" value="1.5046"/>
+			<float name="extIOR" value="1.000277"/>
+            <!-- <color name="kd" value="0.2 0.2 0.2"/> -->
+            <float name="alpha" value="0.2"/>
+		</bsdf>
+		
 	</mesh>
 
 	<mesh type="obj">

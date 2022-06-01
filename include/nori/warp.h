@@ -65,6 +65,8 @@ public:
     /// Warp a uniformly distributed square sample to a Beckmann distribution * cosine for the given 'alpha' parameter
     static Vector3f squareToBeckmann(const Point2f &sample, float alpha);
 
+    static Vector3f squareToGXX(const Point2f &sample, float alpha);
+
     /// Probability density of \ref squareToBeckmann()
     static float squareToBeckmannPdf(const Vector3f &m, float alpha);
 };

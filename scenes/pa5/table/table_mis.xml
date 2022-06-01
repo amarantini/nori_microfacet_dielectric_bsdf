@@ -3,7 +3,7 @@
 <scene>
 	<!-- Independent sample generator, 64 samples per pixel -->
 	<sampler type="independent">
-		<integer name="sampleCount" value="64"/>
+		<integer name="sampleCount" value="1024"/>
 	</sampler>
 
 	<!-- Use the path tracer without multiple importance sampling -->
@@ -20,9 +20,9 @@
 		<!-- Field of view: 35 degrees -->
 		<float name="fov" value="35"/>
 
-		<!-- 800x600 pixels -->
-		<integer name="width" value="800"/>
-		<integer name="height" value="600"/>
+		<!-- 1080x720 pixels -->
+		<integer name="width" value="1080"/>
+		<integer name="height" value="720"/>
 	</camera>
 
 	<!-- Two light sources  -->
@@ -30,7 +30,7 @@
 		<string name="filename" value="meshes/mesh_1.obj"/>
 
 		<emitter type="area">
-			<color name="radiance" value="3,3,2.5"/>
+			<color name="radiance" value="5,5,5"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -62,16 +62,39 @@
 		</transform>
 	</mesh>
 
-
+	<!-- Glass bowl -->
 	<mesh type="obj">
-		<string name="filename" value="meshes/mesh_0.obj"/>
+		<string name="filename" value="meshes/bowl.obj"/>
 
 		<bsdf type="microfacet">
-			<color name="kd" value="0, 0, 0"/>
+			<float name="intIOR" value="1.5046"/>
+			<float name="extIOR" value="1.000277"/>
+			<float name="alpha" value="0.28"/>
+			<color name="kt" value="0.5 0.5 0.6"/>
+			<color name="kr" value="0.5 0.5 0.6"/>
 		</bsdf>
 		<transform name="toWorld">
-			<translate value="3,0,0"/>
+			<translate value="3,-10,0"/>
 		</transform>
+	</mesh>
+
+	<!-- bunny -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/bunny.obj"/>
+		<transform name="toWorld">
+			<translate value="0,0,0"/>
+			<scale value = "70,70,70"/>
+			<rotate angle="180" axis="0,1,0.5"/>
+		</transform>
+		<bsdf type="microfacet">
+            <float name="intIOR" value="1.5046"/>
+			<float name="extIOR" value="1.000277"/>
+            <!-- <color name="kt" value="0.65 0.32 0.75"/>
+			<color name="kr" value="0.6 0.32 0.75"/> -->
+			<color name="kt" value="1 0.75 0.96"/>
+			<color name="kr" value="1 0.75 0.96"/>
+            <float name="alpha" value="0.5"/>
+		</bsdf>
 	</mesh>
 
 	<!-- Diffuse floor -->
@@ -93,7 +116,7 @@
 	<mesh type="obj">
 		<string name="filename" value="meshes/mesh_2.obj"/>
 		<transform name="toWorld">
-			<translate value="-1,0,0"/>
+			<translate value="-5,-3,0"/>
 		</transform>
 
 		<bsdf type="dielectric">
@@ -104,22 +127,28 @@
 
 	<!-- Glass<->Air interface -->
 	<mesh type="obj">
-		<string name="filename" value="meshes/mesh_3.obj"/>
+		<string name="filename" value="meshes/goblet.obj"/>
 		<transform name="toWorld">
-			<translate value="-1,0,0"/>
+			<translate value="-5,-3,0"/>
 		</transform>
 
 		<bsdf type="dielectric">
 			<float name="extIOR" value="1"/>
 			<float name="intIOR" value="1.5"/>
 		</bsdf>
+
+		<!-- <bsdf type="microfacet">
+			<float name="intIOR" value="1.5046"/>
+			<float name="extIOR" value="1.000277"/>
+			<float name="alpha" value="0.2"/>
+		</bsdf> -->
 	</mesh>
 
 	<!-- Glass<->Water interface -->
 	<mesh type="obj">
 		<string name="filename" value="meshes/mesh_4.obj"/>
 		<transform name="toWorld">
-			<translate value="-1,0,0"/>
+			<translate value="-5,-3,0"/>
 		</transform>
 
 		<bsdf type="dielectric">
@@ -127,4 +156,6 @@
 			<float name="intIOR" value="1.33"/>
 		</bsdf>
 	</mesh>
+
+
 </scene>
